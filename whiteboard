@@ -1,0 +1,25 @@
+//
+
+turn base rock paper scissors
+
+heroes:
+1 knights = 3
+2 wizards = 1
+3 thieves = 3
+
+badguys:
+1 Orcs = 2
+2 Ogres = 4
+3
+
+knights > orcs
+heroes + 1
+
+wizards < Ogres
+badguys +1
+
+thieves < 0
+heroes +1
+
+Yay the heroes won!
+
