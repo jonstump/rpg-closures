@@ -7,16 +7,26 @@ var colors = require('colors');
 
 (() => {
 
+
+  const units = createCharStore();
+  const badGuys = createCharStore();
+
+// heros().createChar('wiz')(5);
+// badguys().createChar('orcs')(5);
+// heros().showState();
+// console.log(heros().showState());
+
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
   const responseAnimation = async (dots) => {
-    for (let i = 0; i < dots; i++)
-    {
-      await seconds(0.4);
-      rl.write('.'.black.bgWhite);
+    await seconds(0.4);
+    rl.write('.'.black.bgWhite);
+    if (dots > 0) {
+      return responseAnimation( dots - 1) ;
     }
   };
 
@@ -30,38 +40,57 @@ var colors = require('colors');
       });
     });
 
-    const units = ("wizards" || "knights" || "thieves");
-    const badguys = ("orcs" || "trolls" || "goblins");
-    const dice = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']
-    const response = await ask('Pick Your Unit: '.black.bgWhite);
+    const unit = ["wizards" , "knights" , "thieves"];
+    const badGuy = ["orcs", "trolls", "goblins", "dragons", "hobgoblins", "skeletons"];
+    const dice = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    const response = await ask('\nPick Your Unit: '.black.bgWhite);
 
-    if (response === units)
-    {
-      await seconds(.5);
-      rl.write('The Dice are rolling'.black.bgWhite);
-      const roll = getRand();
-      await responseAnimation(roll + 3);
-      rl.write(`\nYour roll is ${dice[roll - 1].red}`.black.bgWhite + ` ${roll}`.black.bgWhite);
-    }
+    // good -u
+    const addUnits = units().createChar(response);
+    await seconds(.5);
+    rl.write(`The Dice are rolling young ${response}`.black.bgWhite);
+    const roll = getRand();
+    await responseAnimation(roll + 3);
+    rl.write(`\nYour roll is ${dice[roll - 1].red}`.black.bgWhite + ` ${roll}`.black.bgWhite);
 
-    if (response === badguys){
+    // add -u
+    addUnits(roll);
+    await seconds(.5);
 
-    }
-    if (response === 'no')
-    {
-      await seconds(1);
-      rl.write('ok... hmm let me think about that\n.black.bgWhite)');
-      await seconds(3);
-      rl.write('ok lets try that again.. i don\'t believe you\n');
-      await seconds(1);
-      return question();
-    }
-    else {
-      rl.close();
-    }
+    // display -u
+    Object.entries(units().showState()).forEach(([unit,values]) => {
+      rl.write(`\nUnits: ${unit}, Current Amount: ${values}\n`);
+    });
 
+    // bad turn
+    const randomBadGuy = badGuy[getRand()];
+    const addBaddies = units().createChar(randomBadGuy);
+    await seconds(.5);
+    rl.write(`The ${randomBadGuy} is attacking`.black.bgWhite);
+    const badRoll = getRand();
+    addBaddies(badRoll);
+    await responseAnimation(badRoll + 3);
+    rl.write(`\nTheir roll is ${dice[badRoll - 1].red}`.black.bgWhite + ` ${roll}`.black.bgWhite);
+
+    // add -b
+    badGuys(badRoll);
+
+    // win conditionals
+    if (roll > badRoll) rl.write(
+      `\nThe ${response} have defeated the ${randomBadGuy}!\n`.black.bgWhite
+    );
+
+    else if (roll == badRoll) rl.write(
+      `\nIts A Draw, You Save Your Arm ${response}`
+    );
+
+    else rl.write(
+      `\nOh no! The ${randomBadGuy} defeated the ${response}!\n`.black.bgWhite
+    );
+
+    return question();
   };
-
+  // start
   question();
 
 })();
